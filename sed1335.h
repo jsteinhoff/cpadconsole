@@ -31,7 +31,7 @@
  * Memory control:
  * MWRITE	0x42	Write to display memory			0 to 160*30
  * MREAD	0x43	Read from display memory			--
-*/
+ */
 
 /* The following data structures help to set the params for the sed1335
  * commands. Just fill the structure and then write the whole struct

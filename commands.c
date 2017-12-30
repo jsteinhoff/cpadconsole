@@ -42,6 +42,7 @@ struct {
 	{ "sleep",	sleep_function,		SLEEP_DESCRIPTION	},
 	{ "wakeup",	wakeup_function,	WAKEUP_DESCRIPTION	},
 	{ "lcd",	lcd_function,		LCD_DESCRIPTION		},
+	{ "eeprom",	eeprom_function,	EEPROM_DESCRIPTION	},
 	{ "reset",	reset_function,		RESET_DESCRIPTION	},
 	{ "exit",	exit_function,		EXIT_DESCRIPTION	},
 	{ "help",	help_function,		HELP_DESCRIPTION	},
@@ -770,6 +771,28 @@ int flash_function(int argc, char **argv)
 	return cpad_ioctl(CPAD_FLASH, &time) ? 1 : 0;
 }
 
+int eeprom_function(int argc, char **argv)
+{
+	int length, i;
+
+	if (argc != 1)
+		return 2;
+
+	if (cpad_ioctl(CPAD_REEPROM, 0))
+		return 1;
+
+	length = cpad_read();
+	if (length <= 0)
+		return 1;
+
+	info("eeprom:");
+	for (i=2; i<length; i++)
+		info(" %02x", buffer[i]);
+	info("\n");
+
+	return 0;
+}
+
 int reset_function(int argc, char **argv)
 {
 	if (argc != 1)
@@ -810,7 +833,7 @@ int help_function(int argc, char **argv)
 		for (i=0; command_list[i].name; i++)
 			info(" %s", command_list[i].name);
 		info("\n");
-		info("More detailed information on the display controller commands is in the sed1335\n"
+		info("More detailed informations on the display controller commands are in the sed1335\n"
 		"data sheet.\n");
 	}
 	return 0;

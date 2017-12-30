@@ -9,6 +9,8 @@
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
+#include <readline/readline.h>
+#include <readline/history.h>
 
 #include "cpadconsole.h"
 #include "commands.h"
@@ -50,19 +52,12 @@ inline void command_line(int argc, char **argv)
 
 inline void open_files()
 {
-	int test;
-
 	info("Using device %s\n", device_file);
 	if ((cpad = open(device_file, O_RDWR)) < 0) {
 		perror("can not open device");
 		leave(1);
 	}
 	if (input_file) {
-		if ((test = open(input_file, O_RDWR)) < 0) {
-			perror("can not open input file");
-			leave(1);
-		}
-		close(test);
 		if ((input_stream = fopen(input_file, "r")) < 0) {
 			perror("can not open input file");
 			leave(1);
@@ -134,12 +129,11 @@ void leave(int retval)
 int main(int argc, char **argv)
 {
 	int input_length, cpad_argc;
-	size_t max_input_length = 256;
+	char *prompt_str;
 
 	/* malloc */
-	input = (char *) malloc(max_input_length);
 	cpad_argv = (char **) malloc(sizeof(char *) * MAXPARAM);
-	if ((!input) || (!cpad_argv)) {
+	if (!cpad_argv) {
 		perror("not enough memory");
 		leave(errno);
 	}
@@ -149,18 +143,29 @@ int main(int argc, char **argv)
 		info(WELCOME);
 	open_files();
 
+	if (prompt)
+		prompt_str = PROMPT;
+	else
+		prompt_str = NULL;
+	rl_instream = input_stream;
+
 	while (1) {
+		if (input)
+			free(input);
+
 		/* read input */
-		if (prompt)
-			info(PROMPT);
 		errno = 0;
-		input_length = getline(&input, &max_input_length, input_stream);
-		if (input_length < 0) {
+		input = readline(prompt_str);
+		if (!input) {
 			if (!errno)
 				leave(0);
-			perror("getline");
+			perror("readline");
 			leave(errno);
 		}
+		input_length = strlen(input);
+		if (!input_length)
+			continue;
+		add_history(input);
 
 		cpad_argc = parse_input(input, input_length, cpad_argv);
 

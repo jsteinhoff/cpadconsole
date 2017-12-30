@@ -1,6 +1,5 @@
-#LDFLAGS = `Wand-config --ldflags --libs`
-#CFLAGS = `Wand-config --cflags --cppflags`
-LDFLAGS = -lWand
+LDFLAGS = `Wand-config --ldflags --libs` -lreadline -lhistory
+CFLAGS = `Wand-config --cflags --cppflags`
 
 all:	cpadconsole
 

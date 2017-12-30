@@ -178,6 +178,13 @@ command_func lcd_function;
 Description:\n\
 	Reads or sets lcd state.\n"
 
+command_func eeprom_function;
+#define EEPROM_DESCRIPTION \
+"Syntax:\n\
+	eeprom\n\
+Description:\n\
+	Reads eeprom.\n"
+
 command_func reset_function;
 #define RESET_DESCRIPTION \
 "Syntax:\n\
